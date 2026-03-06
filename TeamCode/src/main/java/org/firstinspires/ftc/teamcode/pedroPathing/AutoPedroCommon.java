@@ -3,22 +3,48 @@ package org.firstinspires.ftc.teamcode.pedroPathing;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
-import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import java.util.ArrayList;
+
 public abstract class AutoPedroCommon extends OpMode {
 
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;
 
     private int pathState;
-    ArrayList<PathItem> pathList = new ArrayList<PathItem>() ;
+    ArrayList<PoseItem> poseList = new ArrayList<PoseItem>() ;
+    protected final Pose blue_far_init = new Pose(20, 122, Math.toRadians(140)); // Start Pose of our robot.
+    protected final Pose blue_far_score = new Pose(48, 82, Math.toRadians(136)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
+    protected final Pose blue_1st_row_start = new Pose(50, 78, Math.toRadians(180)); // Highest (First Set) of Artifacts from the Spike Mark.
+    protected final Pose blue_1st_row_end = new Pose(25, 78, Math.toRadians(180)); // Middle (Second Set) of Artifacts from the Spike Mark.
+    protected final Pose blue_2nd_row_start = new Pose(50, 54, Math.toRadians(180)); // Highest (First Set) of Artifacts from the Spike Mark.
+    protected final Pose blue_2nd_row_end = new Pose(25, 54, Math.toRadians(180)); // Middle (Second Set) of Artifacts from the Spike Mark.
+    protected final Pose blue_3rd_row_start = new Pose(50, 30, Math.toRadians(180)); // Highest (First Set) of Artifacts from the Spike Mark.
+    protected final Pose blue_3rd_row_end = new Pose(25, 30, Math.toRadians(180)); // Middle (Second Set) of Artifacts from the Spike Mark.
+    protected final Pose blue_parking = new Pose(41, 38, Math.toRadians(0)); //
+    protected final Pose blue_gate = new Pose(18, 60, Math.toRadians(180));
+    protected final Pose blue_near_init = new Pose(63, 9, Math.toRadians(90)); // Start Pose of our robot.
+    protected final Pose blue_near_score = new Pose(60, 12, Math.toRadians(100)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
+    protected final Pose blue_near_turn_left = new Pose(57, 10, Math.toRadians(180));
+    protected final Pose blue_near_corner = new Pose(22, 10, Math.toRadians(180));
 
+    protected final Pose red_far_init = new Pose(112, 127, Math.toRadians(45)); // Start Pose of our robot.
+    protected final Pose red_far_score = new Pose(88, 90, Math.toRadians(45)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
+    protected final Pose red_1st_row_start = new Pose(90, 83, Math.toRadians(0)); // Highest (First Set) of Artifacts from the Spike Mark.
+    protected final Pose red_1st_row_end = new Pose(120, 81, Math.toRadians(0)); // Middle (Second Set) of Artifacts from the Spike Mark.
+    protected final Pose red_2nd_row_start = new Pose(90, 60, Math.toRadians(0)); // Highest (First Set) of Artifacts from the Spike Mark.
+    protected final Pose red_2nd_row_end = new Pose(116, 57, Math.toRadians(0)); // Middle (Second Set) of Artifacts from the Spike Mark.
+    protected final Pose red_3rd_row_start = new Pose(88, 37, Math.toRadians(0)); // Highest (First Set) of Artifacts from the Spike Mark.
+    protected final Pose red_3rd_row_end = new Pose(127, 33, Math.toRadians(0)); // Middle (Second Set) of Artifacts from the Spike Mark.
+    protected final Pose red_gate = new Pose(127, 65, Math.toRadians(10));
+    protected final Pose red_parking = new Pose(100, 38, Math.toRadians(0));
+    protected final Pose red_near_init = new Pose(73, 9, Math.toRadians(90)); // Start Pose of our robot.
+    protected final Pose red_near_score = new Pose(76, 14, Math.toRadians(80)); // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
+    protected final Pose red_near_turn_left = new Pose(80, 10, Math.toRadians(0));
+    protected final Pose red_near_corner = new Pose(100, 10, Math.toRadians(0));
     public abstract void setPath();
     public void pedroDrive(Pose pose1, Pose pose2) {
         PathChain pathChain = follower.pathBuilder()
@@ -28,16 +54,16 @@ public abstract class AutoPedroCommon extends OpMode {
         follower.followPath(pathChain,true);
     }
     public void autonomousPathUpdate() {
-        if (pathState < pathList.size()) {
+        if ((poseList.size() > 1) && (pathState < (poseList.size() - 1))) {
             if (pathState == 0) {
-                pedroDrive(pathList.get(0).pose1, pathList.get(0).pose2);
+                pedroDrive(poseList.get(0).pose, poseList.get(1).pose);
                 pathState = 1;
                 setPathState(pathState);
             } else {
                 if (!follower.isBusy()) {
-                    String action = pathList.get(pathState-1).action;
+                    String action = poseList.get(pathState).action;
                     if (isDoneAction(action)) {
-                        pedroDrive(pathList.get(pathState).pose1, pathList.get(pathState).pose2);
+                        pedroDrive(poseList.get(pathState).pose, poseList.get(pathState+1).pose);
                         pathState += 1;
                         setPathState(pathState);
                     }
@@ -144,7 +170,7 @@ public abstract class AutoPedroCommon extends OpMode {
         follower = Constants.createFollower(hardwareMap);
         //buildPaths();
         setPath();
-        follower.setStartingPose(pathList.get(0).pose1);
+        follower.setStartingPose(poseList.get(0).pose);
 
     }
 

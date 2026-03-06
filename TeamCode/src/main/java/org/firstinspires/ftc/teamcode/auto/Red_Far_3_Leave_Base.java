@@ -3,8 +3,10 @@ package org.firstinspires.ftc.teamcode.auto;
 
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 //ignore this for now
+@Disabled
 @Autonomous(name="Red_Far_3_Leave_Base")
 public class Red_Far_3_Leave_Base extends AutoHardware  {
 
